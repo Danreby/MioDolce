@@ -36,7 +36,6 @@ export default function RecipesIndex({ recipes }) {
                 }
             />
 
-            {/* Search */}
             <div className="mb-5">
                 <SearchInput
                     value={search}
@@ -73,7 +72,6 @@ export default function RecipesIndex({ recipes }) {
                 </div>
             )}
 
-            {/* Delete confirmation */}
             <Modal open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} title="Excluir Receita" size="sm">
                 <div className="flex flex-col gap-4">
                     <div className="flex gap-3 items-start p-4 bg-red-50 rounded-xl">

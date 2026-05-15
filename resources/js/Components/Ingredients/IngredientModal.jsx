@@ -51,7 +51,6 @@ export default function IngredientModal({ open, onClose, ingredient = null }) {
         <Modal open={open} onClose={close} title={isEditing ? 'Editar Ingrediente' : 'Novo Ingrediente'} size="md">
             <form onSubmit={submit} className="flex flex-col gap-4">
 
-                {/* Nome */}
                 <FormField label="Nome" error={errors.name} required>
                     <input
                         type="text"
@@ -63,7 +62,6 @@ export default function IngredientModal({ open, onClose, ingredient = null }) {
                     />
                 </FormField>
 
-                {/* Unidade + Quantidade comprada */}
                 <div className="grid grid-cols-2 gap-3">
                     <FormField label="Unidade" error={errors.unit} required>
                         <select
@@ -95,7 +93,6 @@ export default function IngredientModal({ open, onClose, ingredient = null }) {
                     </FormField>
                 </div>
 
-                {/* Custo */}
                 <FormField label="Custo da compra (R$)" error={errors.cost_purchased} required>
                     <div className={`flex items-center rounded-xl border bg-white transition-colors ${errors.cost_purchased ? 'border-red-400' : 'border-brown-200 focus-within:border-brown-400 focus-within:ring-2 focus-within:ring-brown-200'}`}>
                         <span className="pl-3 text-sm text-brown-400 shrink-0 select-none">R$</span>
@@ -112,7 +109,6 @@ export default function IngredientModal({ open, onClose, ingredient = null }) {
                     {errors.cost_purchased && <p className="text-xs text-red-500">{errors.cost_purchased}</p>}
                 </FormField>
 
-                {/* Notas */}
                 <FormField label="Observações" error={errors.notes}>
                     <textarea
                         rows={2}
@@ -123,7 +119,6 @@ export default function IngredientModal({ open, onClose, ingredient = null }) {
                     />
                 </FormField>
 
-                {/* Actions */}
                 <div className="flex justify-end gap-3 pt-2 border-t border-cream">
                     <Button type="button" variant="ghost" onClick={close} disabled={processing}>
                         Cancelar

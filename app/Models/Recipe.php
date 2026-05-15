@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Recipe extends Model
 {
     protected $fillable = [
+        'user_id',
         'name',
         'description',
         'yield_quantity',

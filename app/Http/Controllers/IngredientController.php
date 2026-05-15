@@ -13,7 +13,9 @@ class IngredientController extends Controller
 {
     public function index(): Response
     {
-        $ingredients = Ingredient::orderBy('name')
+        $ingredients = auth()->user()
+            ->ingredients()
+            ->orderBy('name')
             ->get()
             ->map(fn ($ingredient) => [
                 ...$ingredient->toArray(),
@@ -28,13 +30,15 @@ class IngredientController extends Controller
 
     public function store(StoreIngredientRequest $request): RedirectResponse
     {
-        Ingredient::create($request->validated());
+        auth()->user()->ingredients()->create($request->validated());
 
         return back()->with('success', 'Ingrediente cadastrado com sucesso!');
     }
 
     public function update(UpdateIngredientRequest $request, Ingredient $ingredient): RedirectResponse
     {
+        abort_unless($ingredient->user_id === auth()->id(), 403);
+
         $ingredient->update($request->validated());
 
         return back()->with('success', 'Ingrediente atualizado com sucesso!');
@@ -42,6 +46,8 @@ class IngredientController extends Controller
 
     public function destroy(Ingredient $ingredient): RedirectResponse
     {
+        abort_unless($ingredient->user_id === auth()->id(), 403);
+
         if ($ingredient->recipeIngredients()->exists()) {
             return back()->with('error', 'Este ingrediente está em uso em receitas e não pode ser excluído.');
         }

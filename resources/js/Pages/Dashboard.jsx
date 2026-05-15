@@ -78,7 +78,6 @@ export default function Dashboard({ stats, recipe_costs, recent_recipes }) {
                 subtitle="Visão geral dos custos e receitas"
             />
 
-            {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
                     label="Ingredientes"
@@ -108,7 +107,6 @@ export default function Dashboard({ stats, recipe_costs, recent_recipes }) {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-                {/* Bar chart */}
                 <div className="xl:col-span-2">
                     <Card>
                         <CardHeader
@@ -127,7 +125,6 @@ export default function Dashboard({ stats, recipe_costs, recent_recipes }) {
                     </Card>
                 </div>
 
-                {/* Recent recipes */}
                 <div>
                     <Card>
                         <CardHeader
@@ -185,7 +182,6 @@ export default function Dashboard({ stats, recipe_costs, recent_recipes }) {
                 </div>
             </div>
 
-            {/* Most expensive */}
             {stats.most_expensive && (
                 <div className="mt-6">
                     <Card>

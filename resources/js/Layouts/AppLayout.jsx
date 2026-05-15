@@ -54,7 +54,6 @@ export default function AppLayout({ children }) {
     return (
         <div className="min-h-screen bg-cream-50 flex">
 
-            {/* Mobile overlay */}
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/50 z-20 lg:hidden animate-fade-in"
@@ -63,7 +62,6 @@ export default function AppLayout({ children }) {
                 />
             )}
 
-            {/* Sidebar */}
             <aside
                 className={`
                     fixed top-0 left-0 h-full w-64 bg-brown-600 z-30 flex flex-col
@@ -73,7 +71,6 @@ export default function AppLayout({ children }) {
                 `}
                 aria-label="Menu de navegação"
             >
-                {/* Logo */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
                     <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 bg-brown-200 rounded-lg flex items-center justify-center">
@@ -93,7 +90,6 @@ export default function AppLayout({ children }) {
                     </button>
                 </div>
 
-                {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin">
                     {NAV_ITEMS.map((item) => (
                         <NavItem
@@ -105,7 +101,6 @@ export default function AppLayout({ children }) {
                     ))}
                 </nav>
 
-                {/* Footer */}
                 <div className="px-6 py-4 border-t border-white/10">
                     <p className="text-[11px] text-white/30 text-center">
                         MioDolce © {new Date().getFullYear()}
@@ -113,10 +108,8 @@ export default function AppLayout({ children }) {
                 </div>
             </aside>
 
-            {/* Main area */}
             <div className="flex-1 flex flex-col min-w-0">
 
-                {/* Top bar */}
                 <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-brown-200/40 px-4 lg:px-8 h-16 flex items-center gap-4 shadow-sm">
                     <button
                         className="lg:hidden p-2 text-brown-600 hover:bg-cream rounded-lg transition-colors"
@@ -132,7 +125,6 @@ export default function AppLayout({ children }) {
                     </div>
                 </header>
 
-                {/* Content */}
                 <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-screen-2xl w-full mx-auto">
                     {children}
                 </main>

@@ -84,7 +84,6 @@ export default function RecipeForm({ recipe, ingredients }) {
             <form onSubmit={submit}>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-                    {/* Left column — main fields */}
                     <div className="xl:col-span-2 flex flex-col gap-6">
                         <Card>
                             <h2 className="text-sm font-semibold text-brown-600 mb-4">Informações da Receita</h2>
@@ -166,7 +165,6 @@ export default function RecipeForm({ recipe, ingredients }) {
                             </div>
                         </Card>
 
-                        {/* Ingredients */}
                         <Card>
                             <IngredientSelector
                                 items={data.ingredients}
@@ -177,7 +175,6 @@ export default function RecipeForm({ recipe, ingredients }) {
                         </Card>
                     </div>
 
-                    {/* Right column — cost preview */}
                     <div className="flex flex-col gap-4">
                         {totalCostPreview > 0 && (
                             <CostSummary data={costPreviewData} />

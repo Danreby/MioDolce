@@ -17,14 +17,21 @@ class RecipeController extends Controller
 
     public function index(): Response
     {
-        $recipes = Recipe::with('recipeIngredients.ingredient')
+        $recipes = auth()->user()
+            ->recipes()
+            ->with('recipeIngredients.ingredient')
             ->orderBy('name')
             ->get()
-            ->map(fn ($recipe) => [
-                ...$recipe->toArray(),
-                'cost'              => $this->costService->calculate($recipe),
-                'ingredients_count' => $recipe->recipeIngredients->count(),
-            ]);
+            ->map(function ($recipe) {
+                $cost = $this->costService->calculate($recipe);
+                return [
+                    ...$recipe->toArray(),
+                    'total_cost'            => $cost['total_cost'],
+                    'cost_per_unit'         => $cost['cost_per_unit'],
+                    'profit_margin_percent' => $cost['profit_margin_percent'],
+                    'ingredients_count'     => $recipe->recipeIngredients->count(),
+                ];
+            });
 
         return Inertia::render('Recipes/Index', [
             'recipes' => $recipes,
@@ -41,7 +48,9 @@ class RecipeController extends Controller
 
     public function store(StoreRecipeRequest $request): RedirectResponse
     {
-        $recipe = Recipe::create($request->safe()->except('ingredients'));
+        $recipe = auth()->user()->recipes()->create(
+            $request->safe()->except('ingredients')
+        );
 
         $this->syncIngredients($recipe, $request->ingredients);
 
@@ -52,6 +61,8 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe): Response
     {
+        abort_unless($recipe->user_id === auth()->id(), 403);
+
         $recipe->load('recipeIngredients.ingredient');
 
         return Inertia::render('Recipes/Show', [
@@ -62,6 +73,8 @@ class RecipeController extends Controller
 
     public function edit(Recipe $recipe): Response
     {
+        abort_unless($recipe->user_id === auth()->id(), 403);
+
         $recipe->load('recipeIngredients');
 
         return Inertia::render('Recipes/Form', [
@@ -72,6 +85,8 @@ class RecipeController extends Controller
 
     public function update(UpdateRecipeRequest $request, Recipe $recipe): RedirectResponse
     {
+        abort_unless($recipe->user_id === auth()->id(), 403);
+
         $recipe->update($request->safe()->except('ingredients'));
 
         $recipe->recipeIngredients()->delete();
@@ -84,6 +99,8 @@ class RecipeController extends Controller
 
     public function destroy(Recipe $recipe): RedirectResponse
     {
+        abort_unless($recipe->user_id === auth()->id(), 403);
+
         $recipe->recipeIngredients()->delete();
         $recipe->delete();
 
@@ -104,7 +121,9 @@ class RecipeController extends Controller
 
     private function getIngredientsForForm(): \Illuminate\Support\Collection
     {
-        return Ingredient::orderBy('name')
+        return auth()->user()
+            ->ingredients()
+            ->orderBy('name')
             ->get(['id', 'name', 'unit', 'quantity_purchased', 'cost_purchased']);
     }
 }

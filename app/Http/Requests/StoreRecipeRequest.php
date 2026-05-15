@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRecipeRequest extends FormRequest
 {
@@ -21,7 +22,10 @@ class StoreRecipeRequest extends FormRequest
             'selling_price_per_unit'   => ['nullable', 'numeric', 'min:0'],
             'notes'                    => ['nullable', 'string', 'max:1000'],
             'ingredients'              => ['required', 'array', 'min:1'],
-            'ingredients.*.ingredient_id' => ['required', 'exists:ingredients,id'],
+            'ingredients.*.ingredient_id' => [
+                'required',
+                Rule::exists('ingredients', 'id')->where('user_id', auth()->id()),
+            ],
             'ingredients.*.quantity_used' => ['required', 'numeric', 'min:0.001'],
         ];
     }

@@ -41,6 +41,20 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error'   => fn () => $request->session()->get('error'),
             ],
+            'auth' => [
+                'user' => fn () => $request->user()
+                    ? [
+                        'id'         => $request->user()->id,
+                        'name'       => $request->user()->name,
+                        'email'      => $request->user()->email,
+                        'phone'      => $request->user()->phone      ?? null,
+                        'bio'        => $request->user()->bio        ?? null,
+                        'avatar_url' => $request->user()->avatar
+                            ? asset('storage/' . $request->user()->avatar)
+                            : null,
+                    ]
+                    : null,
+            ],
         ];
     }
 }

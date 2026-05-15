@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Ingredient extends Model
 {
     protected $fillable = [
+        'user_id',
         'name',
         'unit',
         'quantity_purchased',

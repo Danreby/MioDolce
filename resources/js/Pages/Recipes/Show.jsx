@@ -97,7 +97,6 @@ export default function RecipeShow({ recipe, cost }) {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-                {/* Ingredients table */}
                 <div className="xl:col-span-2 flex flex-col gap-6">
                     <Card padding={false}>
                         <div className="p-5 border-b border-cream-200">
@@ -160,7 +159,6 @@ export default function RecipeShow({ recipe, cost }) {
                     </Card>
                 </div>
 
-                {/* Right column */}
                 <div className="flex flex-col gap-6">
                     <CostSummary data={cost} />
 

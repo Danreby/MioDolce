@@ -18,7 +18,6 @@ export default function RecipeCard({ recipe, onDelete }) {
             transition={{ type: 'spring', stiffness: 400 }}
             className="bg-white rounded-2xl border border-cream-200 shadow-sm p-5 flex flex-col gap-4"
         >
-            {/* Header */}
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-brown-700 truncate text-base">{recipe.name}</h3>
@@ -31,7 +30,6 @@ export default function RecipeCard({ recipe, onDelete }) {
                 </div>
             </div>
 
-            {/* Stats row */}
             <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                     <p className="text-xs text-brown-400">Custo total</p>
@@ -60,7 +58,6 @@ export default function RecipeCard({ recipe, onDelete }) {
                 </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center gap-2 pt-2 border-t border-cream/60">
                 <Link
                     href={route('recipes.show', recipe.id)}

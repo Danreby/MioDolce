@@ -50,7 +50,6 @@ export default function IngredientsIndex({ ingredients }) {
                 }
             />
 
-            {/* Search + Table */}
             <Card padding={false}>
                 <div className="p-4 border-b border-cream-200">
                     <SearchInput
@@ -76,7 +75,6 @@ export default function IngredientsIndex({ ingredients }) {
                     />
                 ) : (
                     <>
-                        {/* Desktop table */}
                         <div className="hidden sm:block overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
@@ -145,7 +143,6 @@ export default function IngredientsIndex({ ingredients }) {
                             </table>
                         </div>
 
-                        {/* Mobile cards */}
                         <div className="sm:hidden divide-y divide-cream/60">
                             {filtered.map((ing) => (
                                 <div key={ing.id} className="p-4 flex items-start gap-3">
@@ -185,14 +182,12 @@ export default function IngredientsIndex({ ingredients }) {
                 )}
             </Card>
 
-            {/* Create / Edit modal */}
             <IngredientModal
                 open={modalOpen}
                 onClose={closeModal}
                 ingredient={editTarget}
             />
 
-            {/* Delete confirmation modal */}
             <Modal open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} title="Excluir Ingrediente" size="sm">
                 <div className="flex flex-col gap-4">
                     <div className="flex gap-3 items-start p-4 bg-red-50 rounded-xl">

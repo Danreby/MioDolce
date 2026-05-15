@@ -59,7 +59,6 @@ export default function IngredientSelector({ items, ingredients, onChange, error
                             key={index}
                             className="flex items-start gap-2 p-3 bg-cream-50 rounded-xl border border-cream-200"
                         >
-                            {/* Ingredient select */}
                             <div className="flex-1 min-w-0">
                                 <select
                                     value={item.ingredient_id}
@@ -76,7 +75,6 @@ export default function IngredientSelector({ items, ingredients, onChange, error
                                 {ingError && <p className="text-xs text-red-500 mt-0.5">{ingError}</p>}
                             </div>
 
-                            {/* Quantity */}
                             <div className="w-28 shrink-0">
                                 <div className={`flex items-center rounded-xl border bg-white transition-colors ${qtyError ? 'border-red-400' : 'border-brown-200 focus-within:border-brown-400 focus-within:ring-2 focus-within:ring-brown-200'}`}>
                                     <input
@@ -95,7 +93,6 @@ export default function IngredientSelector({ items, ingredients, onChange, error
                                 {qtyError && <p className="text-xs text-red-500 mt-0.5">{qtyError}</p>}
                             </div>
 
-                            {/* Row cost preview */}
                             <div className="w-20 shrink-0 flex items-center pt-2.5 justify-end">
                                 {rowCost !== null ? (
                                     <span className="text-xs font-medium text-brown-600 whitespace-nowrap">
@@ -106,7 +103,6 @@ export default function IngredientSelector({ items, ingredients, onChange, error
                                 )}
                             </div>
 
-                            {/* Remove */}
                             <button
                                 type="button"
                                 onClick={() => remove(index)}
