@@ -1,17 +1,29 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
+import AppLayout from './Layouts/AppLayout';
 import '../css/app.css';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${import.meta.env.VITE_APP_NAME ?? 'App'}` : (import.meta.env.VITE_APP_NAME ?? 'App')),
+    title: (title) =>
+        title
+            ? `${title} — MioDolce`
+            : 'MioDolce',
     resolve: (name) => {
         const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
-        return pages[`./Pages/${name}.jsx`];
+        const page  = pages[`./Pages/${name}.jsx`];
+        if (!page) throw new Error(`Page not found: ./Pages/${name}.jsx`);
+
+        // Layout persistente padrão para todas as páginas
+        if (page.default.layout === undefined) {
+            page.default.layout = (children) => <AppLayout>{children}</AppLayout>;
+        }
+
+        return page;
     },
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },
     progress: {
-        color: '#4B5563',
+        color: '#583c29',
     },
 });
