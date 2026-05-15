@@ -19,7 +19,6 @@ export default function AppLayout({ children }) {
 
             <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-            {/* ── Sticky header ── */}
             <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-brown-200/40 px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3 shadow-sm">
 
                 <button
@@ -52,7 +51,6 @@ export default function AppLayout({ children }) {
                 )}
             </header>
 
-            {/* ── Main content ── */}
             <main className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
                 {children}
             </main>

@@ -90,7 +90,6 @@ export default function Sidebar({ open, onClose }) {
         <AnimatePresence>
             {open && (
                 <>
-                    {/* ── Backdrop blur ── */}
                     <motion.div
                         className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[6px]"
                         initial={{ opacity: 0 }}
@@ -101,7 +100,6 @@ export default function Sidebar({ open, onClose }) {
                         aria-hidden="true"
                     />
 
-                    {/* ── Sidebar panel ── */}
                     <motion.aside
                         className="fixed top-0 left-0 h-full w-72 z-50 flex flex-col overflow-hidden shadow-2xl"
                         initial={{ x: -310 }}
@@ -113,7 +111,6 @@ export default function Sidebar({ open, onClose }) {
                             background: 'linear-gradient(175deg, #5a3e2b 0%, #583c29 55%, #4a3221 100%)',
                         }}
                     >
-                        {/* Header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                             <motion.div
                                 className="flex items-center gap-2.5"
@@ -146,7 +143,6 @@ export default function Sidebar({ open, onClose }) {
                             </motion.button>
                         </div>
 
-                        {/* User card */}
                         {user && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.96 }}
@@ -176,7 +172,6 @@ export default function Sidebar({ open, onClose }) {
                             </motion.div>
                         )}
 
-                        {/* Navigation */}
                         <motion.nav
                             variants={containerVariants}
                             initial="hidden"
@@ -202,7 +197,6 @@ export default function Sidebar({ open, onClose }) {
                             ))}
                         </motion.nav>
 
-                        {/* Footer */}
                         <div className="px-3 pb-5 border-t border-white/10 pt-3 space-y-0.5">
                             <motion.button
                                 whileHover={{ x: 5 }}

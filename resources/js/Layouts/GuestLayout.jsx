@@ -11,7 +11,6 @@ export default function GuestLayout({ children }) {
         <div className="min-h-screen bg-cream-50 flex flex-col">
             <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
 
-                {/* Brand mark */}
                 <Link href="/login" className="flex flex-col items-center gap-3 mb-8 group select-none">
                     <div className="w-16 h-16 bg-brown-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:bg-brown-700 transition-colors">
                         <Candy size={28} className="text-white" />
@@ -22,7 +21,6 @@ export default function GuestLayout({ children }) {
                     </div>
                 </Link>
 
-                {/* Card */}
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-cream-200 overflow-hidden">
                     {children}
                 </div>
