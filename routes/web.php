@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\RecipeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-});
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::resource('ingredients', IngredientController::class)
+    ->only(['index', 'store', 'update', 'destroy']);
+
+Route::resource('recipes', RecipeController::class);
