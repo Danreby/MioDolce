@@ -33,7 +33,6 @@ export default function Modal({ open, onClose, title, size = 'md', children }) {
                     aria-modal="true"
                     aria-label={title}
                 >
-                    {/* Backdrop */}
                     <motion.div
                         className="absolute inset-0 bg-black/50"
                         initial={{ opacity: 0 }}
@@ -42,7 +41,6 @@ export default function Modal({ open, onClose, title, size = 'md', children }) {
                         onClick={onClose}
                     />
 
-                    {/* Panel */}
                     <motion.div
                         className={`relative w-full ${SIZES[size] ?? SIZES.md} bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]`}
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -50,7 +48,6 @@ export default function Modal({ open, onClose, title, size = 'md', children }) {
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         transition={{ type: 'spring', duration: 0.3 }}
                     >
-                        {/* Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-cream">
                             <h2 className="text-base font-semibold text-brown-700">{title}</h2>
                             <button
@@ -62,7 +59,6 @@ export default function Modal({ open, onClose, title, size = 'md', children }) {
                             </button>
                         </div>
 
-                        {/* Body */}
                         <div className="flex-1 overflow-y-auto scrollbar-thin p-6">
                             {children}
                         </div>

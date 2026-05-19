@@ -13,7 +13,6 @@ createInertiaApp({
         const page  = pages[`./Pages/${name}.jsx`];
         if (!page) throw new Error(`Page not found: ./Pages/${name}.jsx`);
 
-        // Layout persistente padrão para todas as páginas
         if (page.default.layout === undefined) {
             page.default.layout = (children) => <AppLayout>{children}</AppLayout>;
         }
