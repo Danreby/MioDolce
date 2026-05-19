@@ -19,11 +19,13 @@ class User extends Authenticatable
         'phone',
         'bio',
         'avatar',
+        'google_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 
     protected function casts(): array
@@ -32,6 +34,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
         ];
+    }
+
+    public function hasGoogleLinked(): bool
+    {
+        return !empty($this->google_id);
+    }
+
+    public function hasPasswordSet(): bool
+    {
+        return !empty($this->password);
     }
 
     public function ingredients(): HasMany

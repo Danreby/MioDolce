@@ -1,36 +1,74 @@
 import { useForm, Link } from '@inertiajs/react';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
-import { useState } from 'react';
+import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import GuestLayout from '../../Layouts/GuestLayout';
 import Button from '../../Components/UI/Button';
 import FormField, { inputClass } from '../../Components/UI/Input';
+import GoogleButton from '../../Components/UI/GoogleButton';
+import useGoogleAuth from '../../hooks/useGoogleAuth';
+import useAuthErrors from '../../hooks/useAuthErrors';
 
 Login.layout = (page) => <GuestLayout>{page}</GuestLayout>;
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const googleButtonRef = useRef(null);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         email:    '',
         password: '',
         remember: false,
     });
 
+    const { triggerGoogleLogin, isLoading: googleLoading } = useGoogleAuth('login');
+    const { isGoogleOnly, isThrottle, emailMessage, humanizeError } = useAuthErrors(errors);
+
+    useEffect(() => {
+        if (isGoogleOnly) {
+            googleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [isGoogleOnly]);
+
     const submit = (e) => {
         e.preventDefault();
-        post(route('login.store') ?? '/login');
+        post('/login', { onFinish: () => reset('password') });
     };
 
+    const showEmailError = !isGoogleOnly && !isThrottle && errors.email;
+
     return (
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
             <div className="mb-6">
                 <h2 className="text-xl font-bold text-brown-700">Bem-vindo de volta</h2>
                 <p className="text-sm text-brown-400 mt-1">Entre na sua conta para continuar</p>
             </div>
 
+            {isGoogleOnly && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
+                    <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                    <span>
+                        Este email está vinculado apenas ao Google.{' '}
+                        <button
+                            type="button"
+                            onClick={() => googleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                            className="font-medium underline underline-offset-2 hover:text-amber-800"
+                        >
+                            Usar login com Google →
+                        </button>
+                    </span>
+                </div>
+            )}
+
+            {isThrottle && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                    <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                    <span>{emailMessage}</span>
+                </div>
+            )}
+
             <form onSubmit={submit} className="flex flex-col gap-4">
 
-                <FormField label="E-mail" error={errors.email} required>
+                <FormField label="E-mail" error={showEmailError ? (emailMessage ?? errors.email) : null} required>
                     <input
                         type="email"
                         value={data.email}
@@ -38,7 +76,7 @@ export default function Login() {
                         placeholder="seu@email.com"
                         autoComplete="email"
                         autoFocus
-                        className={inputClass(errors.email)}
+                        className={inputClass(showEmailError)}
                     />
                 </FormField>
 
@@ -80,6 +118,24 @@ export default function Login() {
                     Entrar
                 </Button>
             </form>
+
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-brown-200/60" />
+                </div>
+                <div className="relative flex justify-center">
+                    <span className="bg-white px-3 text-xs text-brown-400 uppercase tracking-wide">ou</span>
+                </div>
+            </div>
+
+            <div ref={googleButtonRef}>
+                <GoogleButton
+                    onClick={triggerGoogleLogin}
+                    isLoading={googleLoading}
+                    label="Entrar com Google"
+                    disabled={processing}
+                />
+            </div>
 
             <div className="mt-6 pt-6 border-t border-cream text-center">
                 <p className="text-sm text-brown-400">
