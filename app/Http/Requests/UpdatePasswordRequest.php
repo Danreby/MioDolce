@@ -14,9 +14,24 @@ class UpdatePasswordRequest extends FormRequest
 
     public function rules(): array
     {
+        $rules = [
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ];
+
+        if (auth()->user()?->hasPasswordSet()) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
+
+        return $rules;
+    }
+
+    public function messages(): array
+    {
         return [
-            'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', Password::defaults()],
+            'current_password.required'      => 'A senha atual é obrigatória.',
+            'current_password.current_password' => 'A senha atual está incorreta.',
+            'password.required'              => 'A nova senha é obrigatória.',
+            'password.confirmed'             => 'As senhas não conferem.',
         ];
     }
 }

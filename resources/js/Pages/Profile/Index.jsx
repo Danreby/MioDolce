@@ -14,7 +14,7 @@ const TABS = [
     { id: 'account',  label: 'Conta',        icon: Settings },
 ];
 
-export default function Index({ stats }) {
+export default function Index({ stats, googleLinked, hasPassword }) {
     const { props: { auth } } = usePage();
     const user = auth.user;
     const [tab, setTab] = useState('info');
@@ -58,8 +58,8 @@ export default function Index({ stats }) {
                         className="p-6"
                     >
                         {tab === 'info'     && <InfoForm     user={user} />}
-                        {tab === 'security' && <SecurityForm />}
-                        {tab === 'account'  && <AccountPanel user={user} stats={stats} />}
+                        {tab === 'security' && <SecurityForm hasPassword={hasPassword} googleLinked={googleLinked} />}
+                        {tab === 'account'  && <AccountPanel user={user} stats={stats} googleLinked={googleLinked} />}
                     </motion.div>
                 </AnimatePresence>
             </div>

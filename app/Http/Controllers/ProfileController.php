@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SetPasswordRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +25,8 @@ class ProfileController extends Controller
                 'member_since'      => $user->created_at->format('d/m/Y'),
                 'member_days'       => (int) $user->created_at->diffInDays(now()),
             ],
+            'googleLinked'  => $user->hasGoogleLinked(),
+            'hasPassword'   => $user->hasPasswordSet(),
         ]);
     }
 
@@ -41,7 +45,7 @@ class ProfileController extends Controller
 
         $user = auth()->user();
 
-        if ($user->avatar) {
+        if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
             Storage::disk('public')->delete($user->avatar);
         }
 
@@ -61,13 +65,28 @@ class ProfileController extends Controller
         return back()->with('flash', ['success' => 'Senha alterada com sucesso!']);
     }
 
+    public function setPassword(SetPasswordRequest $request): \Illuminate\Http\RedirectResponse
+    {
+        $user = auth()->user();
+
+        if ($user->hasPasswordSet()) {
+            return back()->with('flash', ['error' => 'Você já possui uma senha definida. Use a opção de alterar senha.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->validated()['password']),
+        ]);
+
+        return back()->with('flash', ['success' => 'Senha definida com sucesso!']);
+    }
+
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {
         $user = auth()->user();
 
         Auth::logout();
 
-        if ($user->avatar) {
+        if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
             Storage::disk('public')->delete($user->avatar);
         }
 
