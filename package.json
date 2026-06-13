@@ -28,6 +28,7 @@
         "lucide-react": "^0.564.0",
         "react-chartjs-2": "^5.2.0",
         "react-toastify": "^11.0.5",
-        "xlsx-js-style": "^1.2.0"
+        "xlsx-js-style": "^1.2.0",
+        "ziggy-js": "^2.6.2"
     }
 }

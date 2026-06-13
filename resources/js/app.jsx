@@ -1,5 +1,6 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
+import { route } from 'ziggy-js';
 import AppLayout from './Layouts/AppLayout';
 import '../css/app.css';
 
@@ -20,6 +21,8 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props }) {
+        const ziggy = props.initialPage.props.ziggy;
+        window.route = (name, params, absolute) => route(name, params, absolute, ziggy);
         createRoot(el).render(<App {...props} />);
     },
     progress: {

@@ -41,7 +41,7 @@ export default function RecipeShow({ recipe, cost }) {
             [{ v: 'Custo/unidade', s: { font: { bold: true } } }, '', '', '', formatCurrency(cost.cost_per_unit)],
             ...(cost.selling_price_per_unit !== null ? [
                 [{ v: 'Preço venda/un.', s: { font: { bold: true } } }, '', '', '', formatCurrency(cost.selling_price_per_unit)],
-                [{ v: 'Margem de lucro', s: { font: { bold: true } } }, '', '', '', `${cost.profit_margin_percent?.toFixed(2)}%`],
+                [{ v: 'Margem de lucro', s: { font: { bold: true } } }, '', '', '', `${cost.profit_margin_percent?.toFixed(2) ?? '—'}%`],
             ] : []),
         ];
 
