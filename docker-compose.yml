@@ -1,0 +1,26 @@
+# Banco de dados local para desenvolvimento.
+# Porta 3307 no host para não colidir com um MySQL instalado na máquina.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: nxst-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: estoque
+      MYSQL_USER: estoque
+      MYSQL_PASSWORD: estoque
+      TZ: UTC
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  mysql-data:

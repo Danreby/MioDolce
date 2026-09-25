@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. As cores são variáveis CSS trocadas no modo escuro e
+ * expostas ao Tailwind via @theme, gerando classes como bg-panel, text-ink,
+ * border-line. Mudar a paleta = mudar só este arquivo.
+ */
+:root {
+  color-scheme: light;
+  --bg: #eceeec;
+  --panel: #fbfbfa;
+  --sunken: #e2e5e3;
+  --ink: #16191c;
+  --ink-2: #454b52;
+  --muted: #5f666e;
+  --line: #d3d7d9;
+  --line-strong: #aeb4b9;
+  /* Único acento: amarelo de sinalização, sempre com texto em --ink por cima. */
+  --signal: #f2c100;
+  --signal-soft: #faeebb;
+  --danger: #b42318;
+  --danger-soft: #fbe4e0;
+  /* Séries do gráfico (validadas para daltonismo e contraste). */
+  --flow-in: #2366b0;
+  --flow-out: #b88300;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #111315;
+    --panel: #191c1f;
+    --sunken: #0c0e10;
+    --ink: #ecedeb;
+    --ink-2: #c3c7cb;
+    --muted: #959ca4;
+    --line: #2a2f34;
+    --line-strong: #444b52;
+    --signal: #f2c100;
+    --signal-soft: #3a3210;
+    --danger: #f07063;
+    --danger-soft: #3a1714;
+    --flow-in: #4f8fd6;
+    --flow-out: #b88a12;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-signal: var(--signal);
+  --color-signal-soft: var(--signal-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-flow-in: var(--flow-in);
+  --color-flow-out: var(--flow-out);
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+  }
+
+  /* Números alinhados em colunas (tabelas, saldos). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Títulos "de placa": Archivo levemente expandida. */
+  .display {
+    font-stretch: 112%;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

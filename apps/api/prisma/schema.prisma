@@ -1,0 +1,87 @@
+// Schema do banco. Após alterar este arquivo rode `npm run db:migrate`
+// para gerar uma migration SQL versionada em prisma/migrations.
+
+generator client {
+  // Gerador novo do Prisma 7: gera código TypeScript dentro do projeto
+  // (em vez de node_modules), o que deixa o client visível e versionável.
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(80)
+  description String?   @db.VarChar(255)
+  products    Product[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+enum Unit {
+  UN // unidade
+  CX // caixa
+  PCT // pacote
+  KIT
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  sku         String   @unique @db.VarChar(32)
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  unit        Unit     @default(UN)
+  // Dinheiro NUNCA em float: Decimal evita erros de arredondamento.
+  costPrice   Decimal  @map("cost_price") @db.Decimal(10, 2)
+  salePrice   Decimal  @map("sale_price") @db.Decimal(10, 2)
+  // Saldo atual, desnormalizado para leitura rápida. A fonte da verdade é a
+  // soma dos `delta` em stock_movements; os dois são atualizados na mesma
+  // transação (ver StockMovementsService).
+  quantity    Int      @default(0)
+  minQuantity Int      @default(0) @map("min_quantity")
+  // Produtos com histórico não são apagados, são arquivados.
+  active      Boolean  @default(true)
+
+  categoryId Int      @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  movements StockMovement[]
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@index([name])
+  @@map("products")
+}
+
+enum MovementType {
+  IN // entrada (compra, devolução de cliente)
+  OUT // saída (venda, perda)
+  ADJUSTMENT // ajuste de inventário (contagem física)
+}
+
+// Livro-razão do estoque: linhas são apenas inseridas, nunca editadas.
+model StockMovement {
+  id           Int          @id @default(autoincrement())
+  type         MovementType
+  // Variação com sinal: +10 numa entrada, -3 numa saída.
+  delta        Int
+  // Saldo do produto logo após este movimento (facilita auditoria).
+  balanceAfter Int          @map("balance_after")
+  note         String?      @db.VarChar(255)
+
+  productId Int     @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([productId, createdAt])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
