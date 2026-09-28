@@ -8,7 +8,7 @@ using MioDolce.Domain.Stock;
 
 namespace MioDolce.Api.IntegrationTests;
 
-public sealed class StockEndpointsTests(ApiFactory factory)
+public sealed class StockMovementsControllerTests(ApiFactory factory)
 {
     private readonly HttpClient _client = factory.CreateClient();
 

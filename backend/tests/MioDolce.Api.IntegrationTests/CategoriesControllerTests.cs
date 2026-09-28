@@ -6,7 +6,7 @@ using MioDolce.Application.Features.Categories;
 
 namespace MioDolce.Api.IntegrationTests;
 
-public sealed class CategoryEndpointsTests(ApiFactory factory)
+public sealed class CategoriesControllerTests(ApiFactory factory)
 {
     private readonly HttpClient _client = factory.CreateClient();
 
