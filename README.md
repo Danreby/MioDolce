@@ -110,6 +110,8 @@ MioDolce/
 
 ## Guias de estudo
 
+**PDF completo, do zero ao projeto pronto:** [docs/guia-construcao-miodolce.pdf](docs/guia-construcao-miodolce.pdf)
+
 1. [Arquitetura e o caminho de uma requisição](docs/01-arquitetura.md)
 2. [ASP.NET Core: conceito por conceito, com o arquivo onde ele aparece](docs/02-guia-aspnet.md)
 3. [Next.js: como o frontend conversa com a API](docs/03-guia-nextjs.md)

@@ -67,7 +67,7 @@ public enum ProductSort
 
 /// <summary>
 /// Parâmetros de query string de GET /api/products.
-/// Na API é recebido com [AsParameters]: cada parâmetro do construtor vira um ?parametro=.
+/// No controller é recebido com [FromQuery]: cada parâmetro do construtor vira um ?parametro=.
 /// Valores padrão tornam o parâmetro opcional.
 /// </summary>
 public sealed record ProductListQuery(
