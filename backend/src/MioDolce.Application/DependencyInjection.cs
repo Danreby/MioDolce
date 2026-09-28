@@ -5,6 +5,7 @@ using MioDolce.Application.Features.Categories;
 using MioDolce.Application.Features.Dashboard;
 using MioDolce.Application.Features.Products;
 using MioDolce.Application.Features.Stock;
+using MioDolce.Application.Features.Suppliers;
 
 namespace MioDolce.Application;
 
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<ProductService>();
         services.AddScoped<StockService>();
         services.AddScoped<DashboardService>();
+        services.AddScoped<SupplierService>(); // PASSO 8 do guia docs/06: registrar o serviço no DI
 
         return services;
     }

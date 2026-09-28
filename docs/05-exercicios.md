@@ -16,17 +16,18 @@ Em ordem de dificuldade. Cada um diz por onde começar. Rode `dotnet test` ao fi
 
 ## Intermediário
 
-4. **Fornecedores.** Nova entidade `Supplier` e movimentações de entrada com `SupplierId` opcional.
-   Crie a feature completa: Domain, Application (`Features/Suppliers`), Infrastructure (configuração + migration),
-   Api (`SupplierEndpoints`) e a tela no Next.
+4. **Fornecedor na entrada.** O cadastro de fornecedores já existe (veja o [passo a passo](06-passo-a-passo-controller-model-migration.md)).
+   Agora ligue os dois: movimentações de **entrada** passam a aceitar `SupplierId` opcional. Você vai precisar
+   de uma FK nova em `stock_movements` (migration), escolher o `OnDelete` e impedir excluir fornecedor que tem entradas.
+   Depois crie a tela de fornecedores no Next.
 
 5. **Endpoint de arquivar:** `POST /api/products/{id}/archive` e `/restore`, em vez de mandar `isActive` no PUT.
    Compare os dois desenhos de API.
 
-6. **Rate limiting.** Use `builder.Services.AddRateLimiter` com uma política *fixed window* e aplique
-   `.RequireRateLimiting("...")` só no POST de movimentações. Teste com o arquivo `.http`.
+6. **Rate limiting.** Use `builder.Services.AddRateLimiter` com uma política *fixed window*, `app.UseRateLimiter()`
+   e o atributo `[EnableRateLimiting("...")]` só na action de registrar movimentação. Teste com o arquivo `.http`.
 
-7. **Output caching** no `GET /api/dashboard` por 10 segundos (`AddOutputCache` + `.CacheOutput()`).
+7. **Output caching** no `GET /api/dashboard` por 10 segundos (`AddOutputCache` + atributo `[OutputCache]` na action).
    Pense: o que acontece com o painel logo depois de uma movimentação? Como invalidar (tags)?
 
 8. **Tipos gerados.** Gere `frontend/src/lib/api/schema.d.ts` com `npx openapi-typescript http://localhost:5080/openapi/v1.json -o ...`
@@ -34,16 +35,19 @@ Em ordem de dificuldade. Cada um diz por onde começar. Rode `dotnet test` ao fi
 
 ## Avançado
 
-9. **Autenticação.** Proteja a API com JWT (`AddAuthentication().AddJwtBearer()` + `.RequireAuthorization()`
-   nos grupos de escrita) e faça o Next enviar o token a partir das Server Actions.
+9. **Autenticação.** Proteja a API com JWT (`AddAuthentication().AddJwtBearer()` + `[Authorize]` nos controllers,
+   `[AllowAnonymous]` nas leituras) e faça o Next enviar o token a partir das Server Actions.
 
-10. **Relatório CSV.** `GET /api/movements/export?from=...&to=...` devolvendo `text/csv` com `TypedResults.Stream`
-    ou `Results.File`, sem carregar tudo em memória (`AsAsyncEnumerable`).
+10. **Relatório CSV.** `GET /api/movements/export?from=...&to=...` devolvendo `text/csv` com `File(stream, "text/csv")`
+    no controller, sem carregar tudo em memória (`AsAsyncEnumerable`).
 
-11. **Testes de unidade para os serviços da Application**, com um `FakeTimeProvider`
+11. **Um filtro seu.** Crie um action filter que mede o tempo de cada action e loga as que passarem de 200 ms.
+    Registre-o global (como o `FluentValidationActionFilter`) e depois só em um controller, com `[ServiceFilter]`.
+
+12. **Testes de unidade para os serviços da Application**, com um `FakeTimeProvider`
     (pacote `Microsoft.Extensions.TimeProvider.Testing`) para controlar as datas do painel.
 
-12. **Observabilidade.** Adicione OpenTelemetry (traces de ASP.NET Core + EF Core) e veja no console
+13. **Observabilidade.** Adicione OpenTelemetry (traces de ASP.NET Core + EF Core) e veja no console
     o tempo de cada consulta SQL de uma requisição.
 
 ## Para investigar

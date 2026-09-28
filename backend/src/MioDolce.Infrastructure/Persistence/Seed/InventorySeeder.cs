@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MioDolce.Domain.Categories;
 using MioDolce.Domain.Products;
 using MioDolce.Domain.Stock;
+using MioDolce.Domain.Suppliers;
 
 namespace MioDolce.Infrastructure.Persistence.Seed;
 
@@ -27,33 +28,49 @@ internal static class InventorySeeder
 
     private static readonly string[] EntryNotes =
     [
-        "Compra — NF 004817",
+        "Compra NF 004817",
         "Reposição semanal",
-        "Compra — NF 005102",
+        "Compra NF 005102",
     ];
 
+    // Cada bloco checa a PRÓPRIA tabela: quando uma migration nova cria uma tabela
+    // (ex.: suppliers), bancos que já tinham dados também recebem o exemplo dela.
     public static async Task SeedAsync(DbContext context, TimeProvider timeProvider, CancellationToken cancellationToken)
     {
-        if (await context.Set<Category>().AnyAsync(cancellationToken))
+        if (!await context.Set<Category>().AnyAsync(cancellationToken))
         {
-            return;
+            Add(context, timeProvider);
         }
 
-        Add(context, timeProvider);
+        if (!await context.Set<Supplier>().AnyAsync(cancellationToken))
+        {
+            AddSuppliers(context);
+        }
+
         await context.SaveChangesAsync(cancellationToken);
     }
 
     // Versão síncrona: usada pelas ferramentas do EF (dotnet ef database update).
     public static void Seed(DbContext context, TimeProvider timeProvider)
     {
-        if (context.Set<Category>().Any())
+        if (!context.Set<Category>().Any())
         {
-            return;
+            Add(context, timeProvider);
         }
 
-        Add(context, timeProvider);
+        if (!context.Set<Supplier>().Any())
+        {
+            AddSuppliers(context);
+        }
+
         context.SaveChanges();
     }
+
+    private static void AddSuppliers(DbContext context) => context.AddRange(
+        Supplier.Create("Cacau do Sul Ltda", "12.345.678/0001-90", "vendas@cacaudosul.com.br", "(51) 3222-4810"),
+        Supplier.Create("Moinho Santa Clara", "23.456.789/0001-01", "pedidos@moinhosantaclara.com.br", "(41) 3014-7755"),
+        Supplier.Create("Laticínios Serra Azul", "34.567.890/0001-12", null, "(35) 3471-2090"),
+        Supplier.Create("Embalagens Aurora", "45.678.901/0001-23", "contato@embalagensaurora.com.br", null));
 
     private static void Add(DbContext context, TimeProvider timeProvider)
     {

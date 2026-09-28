@@ -96,3 +96,50 @@ GET {{api}}/movements?productId={{productId}}
 
 ### Excluir produto com histórico → 409 (arquive via PUT com isActive=false)
 DELETE {{api}}/products/{{productId}}
+
+### ───────── Fornecedores (exemplo guiado em docs/06) ─────────
+
+GET {{api}}/suppliers
+
+### Busca por nome ou por parte do CNPJ
+GET {{api}}/suppliers?search=moinho
+
+###
+# @name createSupplier
+POST {{api}}/suppliers
+Content-Type: application/json
+
+{
+  "name": "Frutas Vale Verde",
+  "taxId": "56.789.012/0001-34",
+  "email": "comercial@valeverde.com.br",
+  "phone": "(19) 3251-6620"
+}
+
+###
+@supplierId = {{createSupplier.response.body.$.id}}
+
+PUT {{api}}/suppliers/{{supplierId}}
+Content-Type: application/json
+
+{
+  "name": "Frutas Vale Verde Ltda",
+  "taxId": "56789012000134",
+  "email": null,
+  "phone": "(19) 3251-6620"
+}
+
+### CNPJ repetido → 409
+POST {{api}}/suppliers
+Content-Type: application/json
+
+{ "name": "Outro", "taxId": "56789012000134" }
+
+### JSON malformado → 400 automático do [ApiController]
+POST {{api}}/suppliers
+Content-Type: application/json
+
+{ "name":
+
+###
+DELETE {{api}}/suppliers/{{supplierId}}

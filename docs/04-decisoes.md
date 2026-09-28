@@ -19,9 +19,11 @@ Trade-off a conhecer: foi com ele que apareceu o problema de transação descrit
 ### MySQL 8.4 no Docker, porta 3307
 8.4 é a linha LTS do MySQL. A porta 3307 evita conflito com um MySQL instalado na máquina.
 
-### Minimal APIs em vez de Controllers
-Recomendação atual da Microsoft para projetos novos: menos cerimônia, melhor desempenho e
-`TypedResults` alimentando o OpenAPI. Controllers continuam no mercado; veja a comparação no guia.
+### Controllers em vez de Minimal APIs
+O projeto começou com Minimal APIs (a recomendação da Microsoft para projetos novos) e passou para
+**Controllers** para estudar o modelo mais presente em projetos existentes e vagas: `ControllerBase`,
+`[ApiController]`, roteamento por atributo, model binding e filtros MVC. Como a Application não conhece
+HTTP, a troca mexeu só na camada Api. As duas formas estão comparadas no [guia](02-guia-aspnet.md#23-controllers).
 
 ### Clean Architecture enxuta (4 projetos)
 Separa regra de negócio de detalhe técnico e deixa as dependências explícitas nos `.csproj`.
@@ -45,7 +47,8 @@ quem chama a tratar o caso de falha.
 
 ### FluentValidation, não DataAnnotations
 Regras condicionais e reuso (`Include`) ficam mais claros, e os validadores moram na Application,
-longe do HTTP. O .NET 10 trouxe validação nativa para Minimal APIs; é uma alternativa a estudar.
+longe do HTTP. Com controllers, quem executa os validadores é um action filter global; o pacote antigo
+`FluentValidation.AspNetCore` (validação automática) foi descontinuado pelos autores.
 
 ### Guid v7 como chave
 Gerado no código (sem ida ao banco para descobrir o ID) e ordenado pelo tempo, o que evita a

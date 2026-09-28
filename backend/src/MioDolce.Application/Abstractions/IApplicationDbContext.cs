@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MioDolce.Domain.Categories;
 using MioDolce.Domain.Products;
 using MioDolce.Domain.Stock;
+using MioDolce.Domain.Suppliers;
 
 namespace MioDolce.Application.Abstractions;
 
@@ -20,6 +21,8 @@ public interface IApplicationDbContext
     DbSet<Product> Products { get; }
 
     DbSet<StockMovement> StockMovements { get; }
+
+    DbSet<Supplier> Suppliers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

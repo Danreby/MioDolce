@@ -34,45 +34,99 @@ e [Infrastructure/DependencyInjection.cs](../backend/src/MioDolce.Infrastructure
 Repare no **construtor primário** (C# 12): `public sealed class CategoryService(IApplicationDbContext db, ...)`.
 Os parâmetros viram campos acessíveis na classe inteira, sem boilerplate.
 
-## 2.3 Minimal APIs organizadas
+## 2.3 Controllers
 
-Os endpoints estão em [Endpoints/](../backend/src/MioDolce.Api/Endpoints/), um arquivo por recurso:
+Os controllers ficam em [Controllers/](../backend/src/MioDolce.Api/Controllers/), um por recurso.
+Para montar um do zero, siga o [passo a passo](06-passo-a-passo-controller-model-migration.md).
 
-- `MapGroup("/api")` e `MapGroup("/products")` compartilham prefixo e metadados (tags do OpenAPI).
-- Cada handler é um **método estático com nome**, não um lambda gigante.
-- **`TypedResults` + `Results<Ok<T>, ProblemHttpResult>`**: o tipo de retorno documenta os status
-  possíveis, o compilador confere e o OpenAPI é gerado a partir dele.
-- **Binding de parâmetros:** `Guid id` vem da rota, um record vem do corpo JSON, serviços vêm do DI,
-  `CancellationToken` é cancelado se o cliente desistir, e `[AsParameters]` transforma um record inteiro
-  em parâmetros de query string ([ProductContracts.cs](../backend/src/MioDolce.Application/Features/Products/ProductContracts.cs)).
-- **Restrição de rota:** `{id:guid}` faz `/api/products/abc` virar 404 antes de chegar no handler.
-- **`CreatedAtRoute`** devolve `201` + cabeçalho `Location` apontando para o recurso criado.
-
-### E os Controllers?
-
-Controllers continuam válidos e são muito comuns no mercado. A Microsoft recomenda Minimal APIs
-para projetos novos. O mesmo endpoint em Controller ficaria assim, para comparar:
+### Anatomia
 
 ```csharp
-[ApiController]
-[Route("api/categories")]
-public sealed class CategoriesController(CategoryService service) : ControllerBase
+[Route("api/categories")]                       // prefixo das rotas do controller
+[Tags("Categorias")]                            // agrupamento no OpenAPI/Scalar
+public sealed class CategoriesController(CategoryService service) : ApiControllerBase
 {
-    [HttpGet("{id:guid}", Name = "GetCategoryById")]
+    [HttpGet("{id:guid}")]                      // GET api/categories/{id}
     [ProducesResponseType<CategoryResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get(Guid id, CancellationToken ct)
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CategoryResponse>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var result = await service.GetAsync(id, ct);
-        return result.IsSuccess ? Ok(result.Value) : NotFound();
+        var result = await service.GetAsync(id, cancellationToken);
+        return result.IsSuccess ? result.Value : Problem(result.Error);
     }
 }
 ```
 
-Como os serviços da Application não sabem nada de HTTP, trocar Minimal API por Controller
-mexeria **só** na pasta `Endpoints/`. Esse é o ganho de separar camadas.
+| Peça | Para que serve |
+| --- | --- |
+| `ControllerBase` | base para APIs. `Controller` (sem "Base") acrescenta suporte a Views/Razor, que uma API não usa |
+| `[ApiController]` | está em [ApiControllerBase](../backend/src/MioDolce.Api/Controllers/ApiControllerBase.cs) e vale para todos os herdeiros: exige rota por atributo, infere a origem dos parâmetros e responde 400 sozinho se o *model binding* falhar |
+| `[Route]` + `[HttpGet]`/`[HttpPost]`... | **roteamento por atributo**: o caminho completo é o prefixo mais o trecho da action |
+| `{id:guid}` | **restrição de rota**: `api/categories/abc` vira 404 antes de chegar na action |
+| construtor | as dependências vêm do DI. **Uma instância nova do controller por requisição** |
+| `ActionResult<T>` | a action pode devolver o valor (vira 200) ou qualquer `ActionResult` (404, 409...) |
+| `[ProducesResponseType]` | documenta cada status possível para o OpenAPI |
+| `[EndpointSummary]` | o texto que aparece no Scalar |
 
-## 2.4 Validação: FluentValidation + endpoint filter
+### De onde vem cada parâmetro (model binding)
+
+Com `[ApiController]`, a origem é **inferida**:
+
+| Parâmetro | Origem inferida | Exemplo |
+| --- | --- | --- |
+| nome que aparece na rota | rota | `Guid id` em `[HttpGet("{id:guid}")]` |
+| tipo simples (string, int, Guid...) | query string | `string? search` vira `?search=...` |
+| tipo complexo (classe/record) | **corpo JSON** | `CategoryRequest request` |
+| `CancellationToken` | cancelado se o cliente desistir | `CancellationToken cancellationToken` |
+| serviço registrado no DI | contêiner | só com `[FromServices]` explícito |
+
+**Pegadinha:** um record de filtros (`ProductListQuery`) é tipo complexo, então seria lido do *corpo*.
+Por isso ele leva `[FromQuery]` em [ProductsController](../backend/src/MioDolce.Api/Controllers/ProductsController.cs).
+
+### Os helpers de resposta do `ControllerBase`
+
+| Método | Status |
+| --- | --- |
+| `Ok(valor)` ou `return valor;` | 200 |
+| `CreatedAtAction(nameof(GetById), new { id }, valor)` | 201 + cabeçalho `Location` |
+| `Created(url, valor)` | 201 com a URL escrita à mão |
+| `NoContent()` | 204 |
+| `Problem(error)` (nosso, em `ApiControllerBase`) | 400/404/409/422 conforme o tipo do erro |
+
+**Pegadinha do sufixo `Async`:** por padrão o MVC **remove "Async"** do nome das actions. Se a action
+se chamasse `GetByIdAsync`, o `CreatedAtAction(nameof(GetByIdAsync), ...)` não acharia a rota e daria erro.
+Por isso as actions aqui não têm o sufixo.
+
+### Registro
+
+Nada é registrado controller a controller. Em [Api/DependencyInjection.cs](../backend/src/MioDolce.Api/DependencyInjection.cs),
+`AddControllers()` descobre toda classe pública que herda de `ControllerBase`. No
+[Program.cs](../backend/src/MioDolce.Api/Program.cs), `MapControllers()` liga as rotas dos atributos.
+Duas configurações importantes estão ali:
+
+- `SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true`: com `Nullable` ligado, o MVC
+  trataria toda `string` não anulável como `[Required]` e responderia 400 **em inglês, antes do FluentValidation**.
+  Desligamos para a validação ter um dono só.
+- `AddJsonOptions(...)`: controllers usam as opções de JSON **do MVC**, que são separadas das de
+  `ConfigureHttpJsonOptions` (essas valem para Minimal APIs e para o gerador de OpenAPI). Configuramos as duas.
+
+### E as Minimal APIs?
+
+São a outra forma de criar endpoints no ASP.NET Core, e a Microsoft as recomenda para projetos novos.
+A mesma action acima, como Minimal API:
+
+```csharp
+app.MapGet("/api/categories/{id:guid}", async (Guid id, CategoryService service, CancellationToken ct) =>
+{
+    var result = await service.GetAsync(id, ct);
+    return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound();
+});
+```
+
+Como os serviços da Application não sabem nada de HTTP, este projeto trocou de Minimal APIs para
+Controllers mexendo **só na camada Api**. Vale conhecer as duas formas: as duas aparecem no mercado.
+
+## 2.4 Validação: FluentValidation + action filter
 
 - Os validadores ficam junto dos contratos: [ProductValidators.cs](../backend/src/MioDolce.Application/Features/Products/ProductValidators.cs).
 - Os limites (tamanho máximo etc.) vêm das **constantes do domínio** (`Product.NameMaxLength`),
@@ -81,8 +135,23 @@ mexeria **só** na pasta `Endpoints/`. Esse é o ganho de separar camadas.
   na criação quanto na edição. O mesmo vale para a paginação (`PagedQueryValidator`).
 - **Regras condicionais:** `.When(x => x.Type == MovementType.Adjustment)` em
   [StockValidators.cs](../backend/src/MioDolce.Application/Features/Stock/StockValidators.cs).
-- O [ValidationFilter](../backend/src/MioDolce.Api/Filters/ValidationFilter.cs) é um **endpoint filter**:
-  um "middleware por endpoint" que roda antes do handler. É ligado com `.WithRequestValidation<T>()`.
+
+Quem executa os validadores é o [FluentValidationActionFilter](../backend/src/MioDolce.Api/Filters/FluentValidationActionFilter.cs),
+um **action filter global**. O pipeline de uma requisição MVC é:
+
+```
+roteamento → model binding → [ApiController] (400 se o binding falhou) → action filters → action → resultado
+```
+
+O filtro percorre os argumentos da action, pede ao DI um `IValidator<T>` para cada tipo e, se houver
+erros, define `context.Result`. Isso **curto-circuita** o pipeline: a action nem executa.
+
+Existem dois tipos de 400, e vale saber distinguir:
+
+| Situação | Quem responde | Onde se personaliza |
+| --- | --- | --- |
+| JSON malformado, `?page=abc`, enum inexistente | `[ApiController]` (o binding falhou) | `InvalidModelStateResponseFactory` em Api/DependencyInjection.cs |
+| nome vazio, CNPJ com 13 dígitos | FluentValidation (dados legíveis, mas inválidos) | nos validadores da Application |
 
 **Validação de entrada x regra de negócio:** "nome é obrigatório" é validação (400).
 "Não pode sair mais do que o saldo" é regra de negócio: depende do estado do banco, então fica no domínio (422).
@@ -99,7 +168,8 @@ Dois tipos de erro, dois mecanismos:
 - [Result.cs](../backend/src/MioDolce.Domain/Common/Result.cs) e [Error.cs](../backend/src/MioDolce.Domain/Common/Error.cs):
   conversões implícitas deixam escrever `return ProductErrors.NotFound(id);` ou `return product;`.
 - [ProductErrors.cs](../backend/src/MioDolce.Domain/Products/ProductErrors.cs): catálogo de erros com código estável (`Product.InsufficientStock`).
-- [ResultExtensions.ToProblem](../backend/src/MioDolce.Api/Extensions/ResultExtensions.cs): o **único** lugar que traduz tipo de erro para status HTTP.
+- `Problem(Error)` em [ApiControllerBase](../backend/src/MioDolce.Api/Controllers/ApiControllerBase.cs): o **único** lugar que traduz tipo de erro para status HTTP.
+  Usa a `ProblemDetailsFactory` do ASP.NET, que já acrescenta `type`, `traceId` e o `instance` configurado no DI.
 - [GlobalExceptionHandler](../backend/src/MioDolce.Api/Infrastructure/GlobalExceptionHandler.cs): implementa `IExceptionHandler` (.NET 8+). Registra em log e devolve 500 **sem vazar detalhes internos**.
 - `AddProblemDetails` faz **todas** as respostas de erro seguirem a RFC 9457, inclusive 404/405 do próprio framework.
 

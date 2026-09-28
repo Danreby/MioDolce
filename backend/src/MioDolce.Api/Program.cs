@@ -1,5 +1,4 @@
 using MioDolce.Api;
-using MioDolce.Api.Endpoints;
 using MioDolce.Api.Extensions;
 using MioDolce.Application;
 using MioDolce.Infrastructure;
@@ -12,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddApplication()
     .AddInfrastructure()
-    .AddPresentation();
+    .AddPresentation(); // inclui AddControllers()
 
 var app = builder.Build();
 
@@ -37,6 +36,6 @@ app.UseCors();
 
 // ─── 3. Endpoints ─────────────────────────────────────────────────────────────
 app.MapHealthChecks("/health");
-app.MapApiEndpoints();
+app.MapControllers(); // registra as rotas definidas pelos atributos [Route]/[HttpGet]... dos controllers
 
 await app.RunAsync();

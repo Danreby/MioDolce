@@ -1,12 +1,12 @@
 # MioDolce · Estoque
 
 Sistema simples de gerenciamento de estoque, feito para **estudar ASP.NET Core** (foco principal) e **Next.js**.
-O cenário é o almoxarifado de uma confeitaria: produtos, categorias e um livro-razão de movimentações
+O cenário é o almoxarifado de uma confeitaria: produtos, categorias, fornecedores e um livro-razão de movimentações
 (entradas, saídas e ajustes de inventário).
 
 | Camada   | Tecnologia                                                                  |
 | -------- | --------------------------------------------------------------------------- |
-| Backend  | ASP.NET Core 10 (LTS), Minimal APIs, EF Core 10, FluentValidation, OpenAPI + Scalar |
+| Backend  | ASP.NET Core 10 (LTS), Controllers, EF Core 10, FluentValidation, OpenAPI + Scalar |
 | Banco    | MySQL 8.4 LTS (Docker), provider oficial `MySql.EntityFrameworkCore`        |
 | Frontend | Next.js 16 (App Router, Server Components, Server Actions), React 19, Tailwind CSS v4 |
 | Testes   | xUnit v3 + Microsoft Testing Platform, WebApplicationFactory, Testcontainers |
@@ -96,7 +96,7 @@ MioDolce/
 │  │  ├─ MioDolce.Domain/          regras de negócio puras (entidades, Result, erros)
 │  │  ├─ MioDolce.Application/     casos de uso, contratos (DTOs), validação
 │  │  ├─ MioDolce.Infrastructure/  EF Core + MySQL, migrations, seed
-│  │  └─ MioDolce.Api/             endpoints HTTP, DI, middlewares
+│  │  └─ MioDolce.Api/             controllers, filtros, DI, middlewares
 │  └─ tests/
 │     ├─ MioDolce.Domain.Tests/          testes de unidade
 │     └─ MioDolce.Api.IntegrationTests/  API real + MySQL em container
@@ -115,3 +115,4 @@ MioDolce/
 3. [Next.js: como o frontend conversa com a API](docs/03-guia-nextjs.md)
 4. [Decisões técnicas e por quê](docs/04-decisoes.md)
 5. [Exercícios para praticar](docs/05-exercicios.md)
+6. [Passo a passo: model, migration e controller do zero](docs/06-passo-a-passo-controller-model-migration.md)

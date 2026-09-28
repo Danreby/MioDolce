@@ -4,7 +4,7 @@
 
 ```
  Navegador ──HTML──▶ Next.js (servidor) ──HTTP/JSON──▶ ASP.NET Core API ──SQL──▶ MySQL
-                     Server Components                  Minimal APIs
+                     Server Components                  Controllers
                      Server Actions                     EF Core
 ```
 
@@ -77,15 +77,15 @@ Vamos acompanhar **"registrar uma saída de 2 kg"**, do clique até o banco.
    e chama `movementsApi.register(...)`, que faz `POST /api/products/{id}/movements`
    através de [lib/api/client.ts](../frontend/src/lib/api/client.ts).
 
-3. **Roteamento (ASP.NET Core)**
-   [StockEndpoints.cs](../backend/src/MioDolce.Api/Endpoints/StockEndpoints.cs): a rota casa com
-   `MapPost("/products/{productId:guid}/movements", RegisterAsync)`. O ASP.NET lê `productId` da
-   rota, desserializa o JSON em `RegisterMovementRequest` e injeta o `StockService`.
+3. **Roteamento e model binding (ASP.NET Core)**
+   [StockMovementsController.cs](../backend/src/MioDolce.Api/Controllers/StockMovementsController.cs): a rota
+   casa com `[Route("api")]` + `[HttpPost("products/{productId:guid}/movements")]`. O MVC cria o controller
+   (injetando o `StockService` no construtor), lê `productId` da rota e desserializa o JSON em `RegisterMovementRequest`.
 
-4. **Validação (endpoint filter)**
-   [ValidationFilter.cs](../backend/src/MioDolce.Api/Filters/ValidationFilter.cs) roda **antes** do
-   handler e usa o [RegisterMovementRequestValidator](../backend/src/MioDolce.Application/Features/Stock/StockValidators.cs).
-   Se algo estiver errado, a resposta é `400` com os erros por campo e o handler nem executa.
+4. **Validação (action filter)**
+   [FluentValidationActionFilter.cs](../backend/src/MioDolce.Api/Filters/FluentValidationActionFilter.cs) roda **antes** da
+   action e usa o [RegisterMovementRequestValidator](../backend/src/MioDolce.Application/Features/Stock/StockValidators.cs).
+   Se algo estiver errado, a resposta é `400` com os erros por campo e a action nem executa.
 
 5. **Caso de uso (Application)**
    [StockService.RegisterAsync](../backend/src/MioDolce.Application/Features/Stock/StockService.cs):
@@ -102,8 +102,8 @@ Vamos acompanhar **"registrar uma saída de 2 kg"**, do clique até o banco.
    `INSERT INTO stock_movements ...` e `UPDATE products SET QuantityOnHand = ... WHERE Id = ... AND ConcurrencyStamp = ...`.
 
 8. **Resposta HTTP**
-   De volta ao endpoint: sucesso vira `201 Created`; erro vira ProblemDetails com o status certo
-   via [ResultExtensions.ToProblem](../backend/src/MioDolce.Api/Extensions/ResultExtensions.cs)
+   De volta à action `Register`: sucesso vira `201 Created`; erro vira ProblemDetails com o status certo
+   via `Problem(error)` de [ApiControllerBase](../backend/src/MioDolce.Api/Controllers/ApiControllerBase.cs)
    (`422` para estoque insuficiente, `409` para conflito de concorrência, `404` para produto inexistente).
 
 9. **De volta ao Next.js**

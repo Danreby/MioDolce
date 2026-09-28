@@ -5,7 +5,7 @@ namespace MioDolce.Api.Infrastructure;
 
 /// <summary>
 /// Rede de segurança para o que é INESPERADO. Erros de negócio não chegam aqui:
-/// eles viajam como Result e são convertidos em ProblemDetails nos endpoints.
+/// eles viajam como Result e são convertidos em ProblemDetails nos controllers.
 /// Nunca devolvemos detalhes internos (stack trace, SQL) ao cliente num erro 500.
 /// </summary>
 internal sealed partial class GlobalExceptionHandler(
@@ -16,7 +16,8 @@ internal sealed partial class GlobalExceptionHandler(
     {
         var problem = exception switch
         {
-            // Ex.: JSON malformado ou parâmetro com tipo errado.
+            // Ex.: corpo acima do limite de tamanho. (JSON malformado em controllers é tratado
+            // antes, pelo [ApiController]; veja InvalidModelStateResponseFactory.)
             BadHttpRequestException badRequest => new ProblemDetails
             {
                 Status = badRequest.StatusCode,

@@ -3,6 +3,7 @@ using MioDolce.Application.Abstractions;
 using MioDolce.Domain.Categories;
 using MioDolce.Domain.Products;
 using MioDolce.Domain.Stock;
+using MioDolce.Domain.Suppliers;
 
 namespace MioDolce.Infrastructure.Persistence;
 
@@ -30,6 +31,9 @@ public sealed class AppDbContext : DbContext, IApplicationDbContext
     public DbSet<Product> Products => Set<Product>();
 
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+
+    // PASSO 3 do guia docs/06: um DbSet por tabela que a aplicação consulta.
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
