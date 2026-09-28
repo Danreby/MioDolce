@@ -1,0 +1,98 @@
+# Arquivo .http: execute as requisições direto do VS Code (extensão REST Client)
+# ou do Visual Studio / Rider, clicando em "Send Request" acima de cada bloco.
+# As variáveis @nome = valor são reaproveitadas abaixo.
+
+@api = http://localhost:5080/api
+
+### Saúde da aplicação (inclui checagem do banco)
+GET http://localhost:5080/health
+
+### Painel
+GET {{api}}/dashboard
+
+### ───────── Categorias ─────────
+
+GET {{api}}/categories
+
+###
+# @name createCategory
+POST {{api}}/categories
+Content-Type: application/json
+
+{
+  "name": "Massas prontas",
+  "description": "Massas congeladas para tortas"
+}
+
+###
+@categoryId = {{createCategory.response.body.$.id}}
+
+PUT {{api}}/categories/{{categoryId}}
+Content-Type: application/json
+
+{
+  "name": "Massas e bases",
+  "description": null
+}
+
+### Validação: nome vazio → 400 com "errors"
+POST {{api}}/categories
+Content-Type: application/json
+
+{ "name": "" }
+
+### ───────── Produtos ─────────
+
+GET {{api}}/products?page=1&pageSize=5&sort=HighestValue
+
+### Somente com estoque baixo
+GET {{api}}/products?status=Low
+
+### Busca por nome ou SKU
+GET {{api}}/products?search=choco
+
+###
+# @name createProduct
+POST {{api}}/products
+Content-Type: application/json
+
+{
+  "sku": "MAS-FOLH-1",
+  "name": "Massa folhada 1 kg",
+  "description": null,
+  "categoryId": "{{categoryId}}",
+  "unit": "Kilogram",
+  "unitCost": 32.5,
+  "minimumStock": 3,
+  "initialQuantity": 10
+}
+
+###
+@productId = {{createProduct.response.body.$.id}}
+
+GET {{api}}/products/{{productId}}
+
+### ───────── Movimentações ─────────
+
+POST {{api}}/products/{{productId}}/movements
+Content-Type: application/json
+
+{ "type": "Exit", "quantity": 4, "note": "Produção de mil-folhas" }
+
+### Regra de negócio: sair mais do que existe → 422
+POST {{api}}/products/{{productId}}/movements
+Content-Type: application/json
+
+{ "type": "Exit", "quantity": 999 }
+
+### Ajuste de inventário: informa o saldo CONTADO
+POST {{api}}/products/{{productId}}/movements
+Content-Type: application/json
+
+{ "type": "Adjustment", "quantity": 5.5, "note": "Contagem de sexta" }
+
+###
+GET {{api}}/movements?productId={{productId}}
+
+### Excluir produto com histórico → 409 (arquive via PUT com isActive=false)
+DELETE {{api}}/products/{{productId}}

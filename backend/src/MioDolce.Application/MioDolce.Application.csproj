@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Application: casos de uso. Conhece o Domain e define abstrações que a Infrastructure implementa. -->
+  <ItemGroup>
+    <ProjectReference Include="..\MioDolce.Domain\MioDolce.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Só a API base do EF Core (DbSet, IQueryable async). O provider do MySQL fica na Infrastructure. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+</Project>

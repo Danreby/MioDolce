@@ -1,9 +1,17 @@
+# ─── .NET ───────────────────────────────
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+*.trx
+
+# ─── Node / Next.js (o frontend tem o próprio .gitignore também) ───
 node_modules/
-dist/
 .next/
-coverage/
-*.tsbuildinfo
-.env
-.env.local
-!.env.example
-apps/api/src/generated/
+
+# ─── Ferramentas / SO ───────────────────
+.playwright-cli/
+.idea/
+.DS_Store
+Thumbs.db

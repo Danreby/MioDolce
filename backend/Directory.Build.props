@@ -1,0 +1,21 @@
+<Project>
+  <!--
+    Directory.Build.props é importado automaticamente por TODOS os .csproj abaixo desta pasta.
+    Centralizar aqui evita repetir configurações e garante que todos os projetos sigam as mesmas regras.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Qualidade: avisos viram erros e os analisadores recomendados da Microsoft ficam ligados. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Builds reproduzíveis e determinísticos. -->
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+</Project>

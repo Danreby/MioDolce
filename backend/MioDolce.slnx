@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MioDolce.Api/MioDolce.Api.csproj" />
+    <Project Path="src/MioDolce.Application/MioDolce.Application.csproj" />
+    <Project Path="src/MioDolce.Domain/MioDolce.Domain.csproj" />
+    <Project Path="src/MioDolce.Infrastructure/MioDolce.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MioDolce.Api.IntegrationTests/MioDolce.Api.IntegrationTests.csproj" />
+    <Project Path="tests/MioDolce.Domain.Tests/MioDolce.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

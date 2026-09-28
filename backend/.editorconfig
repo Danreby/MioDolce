@@ -1,0 +1,52 @@
+# EditorConfig: padroniza estilo de código entre editores (VS, VS Code, Rider).
+# As regras marcadas como "warning" quebram o build por causa de TreatWarningsAsErrors.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,xml,csproj,props,slnx,yml,yaml}]
+indent_size = 2
+
+[*.cs]
+# Namespaces com escopo de arquivo (C# 10+): menos indentação.
+csharp_style_namespace_declarations = file_scoped:warning
+# Usings fora do namespace e System primeiro.
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_sort_system_directives_first = true
+# var quando o tipo é óbvio.
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_for_built_in_types = true:suggestion
+# Preferências modernas.
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_prefer_braces = true:warning
+dotnet_style_readonly_field = true:warning
+# Campos privados com _camelCase.
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
+# ConfigureAwait(false) não é necessário em apps ASP.NET Core (não há SynchronizationContext).
+dotnet_diagnostic.CA2007.severity = none
+# Tipos públicos são intencionais: são consumidos por outros projetos da solução.
+dotnet_diagnostic.CA1515.severity = none
+# Evita conflito com palavras reservadas de OUTRAS linguagens .NET (ex.: "Error" no VB). Projeto é só C#.
+dotnet_diagnostic.CA1716.severity = none
+
+# Código gerado pelo EF Core (migrations) não deve ser analisado.
+[**/Migrations/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[tests/**.cs]
+# Nomes de testes usam underscore: Metodo_Cenario_ResultadoEsperado.
+dotnet_diagnostic.CA1707.severity = none

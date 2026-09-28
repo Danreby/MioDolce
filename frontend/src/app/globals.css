@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/*
+  Tokens de design em variáveis CSS.
+  O modo escuro troca só os VALORES; os componentes usam sempre os mesmos nomes
+  (bg-surface, text-ink, border-line...). Assim nenhum componente precisa de "dark:".
+
+  Sistema de raios: controles (botões, inputs) = rounded-md; blocos/painéis = rounded-lg.
+  Paleta: neutros frios + UM acento (pistache). Âmbar e vermelho são reservados para estado
+  do estoque (baixo / zerado), nunca decorativos.
+*/
+:root {
+  --bg: #f3f4f2;
+  --surface: #fbfbfa;
+  --sunken: #eceeeb;
+  --ink: #16191a;
+  --ink-2: #41474a;
+  --muted: #656b6e;
+  --line: #dcdfdb;
+  --line-strong: #c4c8c3;
+
+  --accent: #4f6d14;
+  --accent-ink: #f6f8ef;
+  --accent-soft: #e5ecd3;
+
+  --warn: #8f5304;
+  --warn-soft: #faedd6;
+  --danger: #b3261e;
+  --danger-soft: #fbe5e2;
+
+  /* Séries do gráfico de fluxo (validadas para daltonismo e contraste). */
+  --flow-in: #5f7f1c;
+  --flow-out: #2f66b3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101211;
+    --surface: #181b19;
+    --sunken: #0c0e0d;
+    --ink: #e8ebe7;
+    --ink-2: #b7bdb8;
+    --muted: #8e958f;
+    --line: #2a2f2c;
+    --line-strong: #3a403c;
+
+    --accent: #a6c95f;
+    --accent-ink: #152006;
+    --accent-soft: #243015;
+
+    --warn: #f1b862;
+    --warn-soft: #2d2413;
+    --danger: #f4978e;
+    --danger-soft: #311a18;
+
+    --flow-in: #7a9f33;
+    --flow-out: #5f8cd2;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-flow-in: var(--flow-in);
+  --color-flow-out: var(--flow-out);
+
+  --font-sans: var(--font-instrument-sans);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-feature-settings: "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Colunas numéricas alinham pelo dígito. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

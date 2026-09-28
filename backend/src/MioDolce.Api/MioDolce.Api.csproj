@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Api: camada de apresentação HTTP e "composition root" (onde a injeção de dependência é montada). -->
+  <PropertyGroup>
+    <UserSecretsId>miodolce-api-6b1f3c1e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MioDolce.Application\MioDolce.Application.csproj" />
+    <ProjectReference Include="..\MioDolce.Infrastructure\MioDolce.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <!-- Necessário para "dotnet ef migrations add" usar este projeto como startup. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
