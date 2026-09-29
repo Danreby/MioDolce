@@ -66,6 +66,24 @@ export function ProductForm({ categories, product }: { categories: Category[]; p
           </Select>
         </Field>
 
+        <Field label="Código de barras" htmlFor="barcode" hint="Opcional. EAN de 8 a 14 dígitos." errors={errors.barcode}>
+          <Input
+            {...describedBy("barcode", errors.barcode, true)}
+            defaultValue={value("barcode", product?.barcode)}
+            inputMode="numeric"
+            autoComplete="off"
+            className="font-mono"
+          />
+        </Field>
+
+        <Field label="Descrição" htmlFor="description" hint="Opcional." errors={errors.description} className="md:col-span-2">
+          <Textarea {...describedBy("description", errors.description, true)} defaultValue={value("description", product?.description)} rows={3} />
+        </Field>
+      </fieldset>
+
+      <fieldset className={`grid gap-5 ${editing ? "md:grid-cols-3" : "md:grid-cols-4"}`}>
+        <legend className="mb-4 text-[15px] font-semibold text-ink">Custo e estoque</legend>
+
         <Field label="Unidade de medida" htmlFor="unit" errors={errors.unit}>
           <Select {...describedBy("unit", errors.unit)} defaultValue={value("unit", product?.unit ?? "Unit")}>
             {unitsOfMeasure.map((unit) => (
@@ -75,14 +93,6 @@ export function ProductForm({ categories, product }: { categories: Category[]; p
             ))}
           </Select>
         </Field>
-
-        <Field label="Descrição" htmlFor="description" hint="Opcional." errors={errors.description} className="md:col-span-2">
-          <Textarea {...describedBy("description", errors.description, true)} defaultValue={value("description", product?.description)} rows={3} />
-        </Field>
-      </fieldset>
-
-      <fieldset className="grid gap-5 md:grid-cols-3">
-        <legend className="mb-4 text-[15px] font-semibold text-ink">Custo e estoque</legend>
 
         <Field label="Custo unitário (R$)" htmlFor="unitCost" errors={errors.unitCost}>
           <Input {...describedBy("unitCost", errors.unitCost)} type="number" inputMode="decimal" min={0} step="0.01" defaultValue={value("unitCost", product?.unitCost ?? 0)} />

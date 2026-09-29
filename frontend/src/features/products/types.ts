@@ -12,6 +12,7 @@ export type Product = {
   sku: string;
   name: string;
   description: string | null;
+  barcode: string | null;
   categoryId: string;
   categoryName: string;
   unit: UnitOfMeasure;
@@ -38,6 +39,7 @@ export type ProductListQuery = {
 export type ProductDetails = {
   name: string;
   description: string | null;
+  barcode: string | null;
   categoryId: string;
   unit: UnitOfMeasure;
   unitCost: number;

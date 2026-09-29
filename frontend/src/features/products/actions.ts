@@ -12,6 +12,7 @@ function readDetails(formData: FormData): ProductDetails {
   return {
     name: toText(formData.get("name")),
     description: toOptionalText(formData.get("description")),
+    barcode: toOptionalText(formData.get("barcode")),
     categoryId: toText(formData.get("categoryId")),
     unit: toText(formData.get("unit")) as UnitOfMeasure,
     unitCost: toNumber(formData.get("unitCost")),

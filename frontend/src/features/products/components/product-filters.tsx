@@ -21,9 +21,9 @@ export function ProductFilters({
       {current.status ? <input type="hidden" name="status" value={current.status} /> : null}
 
       <label className="relative">
-        <span className="sr-only">Buscar por nome ou SKU</span>
+        <span className="sr-only">Buscar por nome, SKU ou código de barras</span>
         <MagnifyingGlassIcon size={16} className="pointer-events-none absolute left-3 top-2.5 text-muted" aria-hidden />
-        <Input name="search" type="search" defaultValue={current.search} placeholder="Buscar por nome ou SKU" className="pl-9" />
+        <Input name="search" type="search" defaultValue={current.search} placeholder="Buscar por nome, SKU ou código de barras" className="pl-9" />
       </label>
 
       <label>

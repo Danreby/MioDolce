@@ -61,6 +61,7 @@ export default async function ProductPage({ params }: PageProps<"/produtos/[id]"
             <dl className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2 text-sm">
               <Fact label="Estoque mínimo" value={`${formatQuantity(product.minimumStock)} ${unit}`} />
               <Fact label="Unidade" value={unitLabels[product.unit]} />
+              <Fact label="Código de barras" value={product.barcode ?? "Não informado"} />
               <Fact label="Custo unitário" value={formatMoney(product.unitCost)} />
               <Fact label="Valor em estoque" value={formatMoney(product.stockValue)} />
               <Fact label="Cadastrado em" value={formatDateTime(product.createdAtUtc)} />
