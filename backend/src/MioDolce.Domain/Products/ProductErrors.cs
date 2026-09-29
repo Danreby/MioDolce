@@ -27,6 +27,10 @@ public static class ProductErrors
         "Product.SkuAlreadyExists",
         "Já existe um produto com esse SKU.");
 
+    public static readonly Error BarcodeAlreadyExists = Error.Conflict(
+        "Product.BarcodeAlreadyExists",
+        "Já existe um produto com esse código de barras.");
+
     public static readonly Error CategoryDoesNotExist = Error.Validation(
         "Product.CategoryDoesNotExist",
         "A categoria informada não existe.");

@@ -166,7 +166,7 @@ internal static class InventorySeeder
     }
 
     private static Product P(string sku, string name, Category category, UnitOfMeasure unit, decimal cost, decimal minimum) =>
-        Product.Create(sku, name, description: null, category.Id, unit, cost, minimum);
+        Product.Create(sku, name, description: null, barcode: null, category.Id, unit, cost, minimum);
 
     private static decimal Between(Random random, decimal min, decimal max) =>
         min + ((max - min) * (decimal)random.NextDouble());

@@ -15,6 +15,11 @@ public sealed class Product : AuditableEntity
     public const int NameMaxLength = 120;
     public const int DescriptionMaxLength = 500;
 
+    // EXEMPLO DE MIGRATION (docs/06, exemplo 2): coluna nova numa tabela que já existe.
+    // EAN-8, UPC-A (12), EAN-13 e GTIN-14: de 8 a 14 dígitos.
+    public const int BarcodeMinLength = 8;
+    public const int BarcodeMaxLength = 14;
+
     private Product()
     {
     }
@@ -25,6 +30,9 @@ public sealed class Product : AuditableEntity
     public string Name { get; private set; } = string.Empty;
 
     public string? Description { get; private set; }
+
+    /// <summary>Código de barras (EAN/GTIN) só com dígitos. Opcional, mas único quando informado.</summary>
+    public string? Barcode { get; private set; }
 
     public Guid CategoryId { get; private set; }
 
@@ -49,6 +57,7 @@ public sealed class Product : AuditableEntity
         string sku,
         string name,
         string? description,
+        string? barcode,
         Guid categoryId,
         UnitOfMeasure unit,
         decimal unitCost,
@@ -59,8 +68,15 @@ public sealed class Product : AuditableEntity
             Sku = Guard.Text(sku, SkuMaxLength).ToUpperInvariant(),
         };
 
-        product.UpdateDetails(name, description, categoryId, unit, unitCost, minimumStock);
+        product.UpdateDetails(name, description, barcode, categoryId, unit, unitCost, minimumStock);
         return product;
+    }
+
+    /// <summary>"789 1234 56789-0" → "7891234567890". Vazio (ou sem dígitos) → null.</summary>
+    public static string? NormalizeBarcode(string? value)
+    {
+        var digits = new string((value ?? string.Empty).Where(char.IsAsciiDigit).ToArray());
+        return digits.Length == 0 ? null : digits;
     }
 
     public static StockStatus ResolveStatus(decimal quantityOnHand, decimal minimumStock) =>
@@ -71,6 +87,7 @@ public sealed class Product : AuditableEntity
     public void UpdateDetails(
         string name,
         string? description,
+        string? barcode,
         Guid categoryId,
         UnitOfMeasure unit,
         decimal unitCost,
@@ -83,6 +100,12 @@ public sealed class Product : AuditableEntity
 
         Name = Guard.Text(name, NameMaxLength);
         Description = Guard.OptionalText(description, DescriptionMaxLength);
+        Barcode = NormalizeBarcode(barcode);
+        if (Barcode is { Length: < BarcodeMinLength or > BarcodeMaxLength })
+        {
+            throw new ArgumentOutOfRangeException(nameof(barcode), $"O código de barras deve ter de {BarcodeMinLength} a {BarcodeMaxLength} dígitos.");
+        }
+
         CategoryId = categoryId;
         Unit = unit;
         UnitCost = Guard.NotNegative(unitCost);

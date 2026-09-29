@@ -25,7 +25,23 @@ public sealed class ProductTests
     public void Create_WithEmptyCategory_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            Product.Create("SKU", "Nome", null, Guid.Empty, UnitOfMeasure.Unit, 1, 1));
+            Product.Create("SKU", "Nome", null, null, Guid.Empty, UnitOfMeasure.Unit, 1, 1));
+    }
+
+    [Theory]
+    [InlineData("789 1234 56789-0", "7891234567890")]
+    [InlineData("  ", null)]
+    [InlineData(null, null)]
+    public void NormalizeBarcode_KeepsOnlyDigits(string? input, string? expected)
+    {
+        Assert.Equal(expected, Product.NormalizeBarcode(input));
+    }
+
+    [Fact]
+    public void Create_WithBarcodeOfWrongLength_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            Product.Create("SKU", "Nome", null, "12345", Guid.CreateVersion7(), UnitOfMeasure.Unit, 1, 1));
     }
 
     [Fact]
@@ -124,7 +140,7 @@ public sealed class ProductTests
     }
 
     private static Product NewProduct(string sku = "SKU-1") =>
-        Product.Create(sku, "Chocolate 70%", null, Guid.CreateVersion7(), UnitOfMeasure.Kilogram, 90m, 5m);
+        Product.Create(sku, "Chocolate 70%", null, null, Guid.CreateVersion7(), UnitOfMeasure.Kilogram, 90m, 5m);
 
     private static Product NewProductWithBalance(decimal balance)
     {

@@ -24,6 +24,13 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.QuantityOnHand).HasPrecision(18, 3);
         builder.Property(p => p.MinimumStock).HasPrecision(18, 3);
 
+        // EXEMPLO DE MIGRATION (docs/06, exemplo 2): estas duas linhas + a propriedade Barcode
+        // no model são tudo que a migration "AddBarcodeToProducts" precisou para ser gerada.
+        builder.Property(p => p.Barcode).HasMaxLength(Product.BarcodeMaxLength);
+        // Índice único em coluna ANULÁVEL: no MySQL, vários produtos podem ficar sem código
+        // (NULL não conflita com NULL), mas dois produtos nunca têm o mesmo código.
+        builder.HasIndex(p => p.Barcode).IsUnique();
+
         builder.HasIndex(p => p.Sku).IsUnique();
         builder.HasIndex(p => p.Name);
 

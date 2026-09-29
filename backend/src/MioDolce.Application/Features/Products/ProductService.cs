@@ -51,6 +51,7 @@ public sealed partial class ProductService(
             sku,
             request.Name,
             request.Description,
+            barcode: null, // temporário: o passo 3 troca por request.Barcode
             request.CategoryId,
             request.Unit,
             request.UnitCost,
@@ -99,6 +100,7 @@ public sealed partial class ProductService(
         product.UpdateDetails(
             request.Name,
             request.Description,
+            product.Barcode, // temporário: mantém o valor atual até o passo 3
             request.CategoryId,
             request.Unit,
             request.UnitCost,
