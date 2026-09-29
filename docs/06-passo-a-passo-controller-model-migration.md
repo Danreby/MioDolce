@@ -272,6 +272,114 @@ em "Send Request" em cada bloco (extensão REST Client no VS Code). Ou use a int
 
 ---
 
+## Exemplo 2: migration que altera uma tabela existente (`AddBarcodeToProducts`)
+
+Fornecedores foi uma tabela **nova**. No dia a dia, o mais comum é **mudar uma tabela que já tem dados**.
+Este exemplo adicionou um código de barras (EAN) opcional e único aos produtos.
+
+### 1. Mude o model
+
+Em [Product.cs](../backend/src/MioDolce.Domain/Products/Product.cs), uma propriedade nova (procure por `EXEMPLO DE MIGRATION`):
+
+```csharp
+public string? Barcode { get; private set; }   // "?" = coluna opcional (aceita NULL)
+```
+
+### 2. Mude a configuração
+
+Em [ProductConfiguration.cs](../backend/src/MioDolce.Infrastructure/Persistence/Configurations/ProductConfiguration.cs):
+
+```csharp
+builder.Property(p => p.Barcode).HasMaxLength(Product.BarcodeMaxLength);   // varchar(14)
+builder.HasIndex(p => p.Barcode).IsUnique();                               // índice único
+```
+
+O `DbSet<Product>` já existia, então não há passo 3.
+
+### 3. Gere a migration
+
+```bash
+cd backend
+dotnet ef migrations add AddBarcodeToProducts --project src/MioDolce.Infrastructure --startup-project src/MioDolce.Api
+```
+
+O EF comparou o modelo com o snapshot, percebeu "coluna e índice novos em `products`" e gerou
+[20260929125644_AddBarcodeToProducts.cs](../backend/src/MioDolce.Infrastructure/Persistence/Migrations/20260929125644_AddBarcodeToProducts.cs):
+
+```csharp
+protected override void Up(MigrationBuilder migrationBuilder)
+{
+    migrationBuilder.AddColumn<string>(name: "Barcode", table: "products",
+        type: "varchar(14)", maxLength: 14, nullable: true);
+
+    migrationBuilder.CreateIndex(name: "IX_products_Barcode", table: "products",
+        column: "Barcode", unique: true);
+}
+
+protected override void Down(MigrationBuilder migrationBuilder)   // desfaz na ordem inversa
+{
+    migrationBuilder.DropIndex(name: "IX_products_Barcode", table: "products");
+    migrationBuilder.DropColumn(name: "Barcode", table: "products");
+}
+```
+
+Compare com a de fornecedores: lá era `CreateTable`, aqui é `AddColumn`. O snapshot
+(`AppDbContextModelSnapshot.cs`) também foi atualizado sozinho.
+
+### 4. Aplique e confira
+
+```bash
+dotnet ef migrations list     --project src/MioDolce.Infrastructure --startup-project src/MioDolce.Api
+#   20260928184137_InitialCreate
+#   20260928194753_AddSuppliers
+#   20260929125644_AddBarcodeToProducts (Pending)     ← ainda não aplicada
+
+dotnet ef database update     --project src/MioDolce.Infrastructure --startup-project src/MioDolce.Api
+#   Applying migration '20260929125644_AddBarcodeToProducts'.
+```
+
+(Ou simplesmente rode a API: em Development ela aplica as pendentes ao subir.) No MySQL:
+
+```
+mysql> SHOW COLUMNS FROM products LIKE 'Barcode';
+| Barcode | varchar(14) | YES | UNI | NULL |
+```
+
+Os 20 produtos que já existiam ficaram com `Barcode = NULL`. **Nenhum dado foi perdido.**
+
+> **E se a coluna fosse obrigatória?** Com `string Barcode` (sem `?`), a coluna seria `NOT NULL` e o MySQL
+> não teria o que colocar nas linhas existentes. Você precisaria dar um valor padrão (`HasDefaultValue(...)`
+> na configuração) ou editar o `Up()` gerado para preencher os dados antes de tornar a coluna obrigatória.
+> É por isso que colunas novas em tabelas com dados costumam nascer opcionais.
+
+### 5. Leve o campo até a API e a tela
+
+A migration só muda o banco. Para o campo ser usável, ele passou pelas outras camadas:
+
+| Camada | Arquivo | Mudança |
+| --- | --- | --- |
+| Domain | `Product.cs`, `ProductErrors.cs` | propriedade, normalização (só dígitos), erro `BarcodeAlreadyExists` |
+| Application | `ProductContracts.cs` | `Barcode` no request e no response |
+| Application | `ProductValidators.cs` | 8 a 14 dígitos, quando informado |
+| Application | `ProductService.cs` | checagem de duplicidade (409) na criação e edição |
+| Application | `ProductMappings.cs`, `ProductQueryExtensions.cs` | incluir no response; buscar por código |
+| tests | `ProductsControllerTests.cs`, `ProductTests.cs` | 8 testes novos |
+| frontend | `types.ts`, `actions.ts`, `product-form.tsx`, `produtos/[id]/page.tsx` | tipo, campo no formulário, exibição |
+
+> **Repare:** o **controller não mudou**. Ele recebe `CreateProductRequest` e devolve `ProductResponse`;
+> como os records ganharam a propriedade, o JSON ganhou o campo automaticamente.
+
+### Se quiser desfazer este exemplo
+
+```bash
+dotnet ef database update AddSuppliers ...   # volta o banco para antes (roda o Down)
+dotnet ef migrations remove ...              # apaga os arquivos da migration e restaura o snapshot
+```
+
+(os `...` são os mesmos `--project` e `--startup-project`). Depois disso, remova o código do `Barcode` nas outras camadas.
+
+---
+
 ## Agora é com você
 
 Repita o processo para um recurso novo, sem olhar o de fornecedores até travar:

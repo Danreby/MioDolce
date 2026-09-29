@@ -4,9 +4,10 @@ Em ordem de dificuldade. Cada um diz por onde começar. Rode `dotnet test` ao fi
 
 ## Aquecimento
 
-1. **Novo campo no produto: `Barcode` (opcional, até 20 caracteres).**
-   Entidade → configuração do EF → nova migration → contratos → validador → tipos do front → formulário.
-   É o exercício que passa por todas as camadas; repare em quantos arquivos você precisa tocar e por quê.
+1. **Novo campo no produto: `Brand` (marca, opcional, até 60 caracteres).**
+   Siga o [exemplo 2 do passo a passo](06-passo-a-passo-controller-model-migration.md#exemplo-2-migration-que-altera-uma-tabela-existente-addbarcodetoproducts)
+   (código de barras): model → configuração → migration → contratos → validador → tipos do front → formulário.
+   Depois, faça uma segunda migration tornando a marca **obrigatória** e veja o que é preciso fazer com os produtos que já existem.
 
 2. **Regra de negócio: observação obrigatória em ajustes.**
    Onde colocar: no validador (formato) ou no domínio (regra)? Justifique e escreva o teste.
