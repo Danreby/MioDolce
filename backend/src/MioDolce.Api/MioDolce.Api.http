@@ -60,6 +60,7 @@ Content-Type: application/json
   "sku": "MAS-FOLH-1",
   "name": "Massa folhada 1 kg",
   "description": null,
+  "barcode": "789 1234 56789-1",
   "categoryId": "{{categoryId}}",
   "unit": "Kilogram",
   "unitCost": 32.5,
@@ -71,6 +72,9 @@ Content-Type: application/json
 @productId = {{createProduct.response.body.$.id}}
 
 GET {{api}}/products/{{productId}}
+
+### Busca pelo código de barras (coluna criada pela migration AddBarcodeToProducts)
+GET {{api}}/products?search=7891234567891
 
 ### ───────── Movimentações ─────────
 

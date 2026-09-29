@@ -42,6 +42,11 @@ public sealed partial class ProductService(
             return ProductErrors.SkuAlreadyExists;
         }
 
+        if (await BarcodeInUseAsync(request.Barcode, exceptId: null, cancellationToken))
+        {
+            return ProductErrors.BarcodeAlreadyExists;
+        }
+
         if (!await db.Categories.AnyAsync(c => c.Id == request.CategoryId, cancellationToken))
         {
             return ProductErrors.CategoryDoesNotExist;
@@ -51,7 +56,7 @@ public sealed partial class ProductService(
             sku,
             request.Name,
             request.Description,
-            barcode: null, // temporário: o passo 3 troca por request.Barcode
+            request.Barcode,
             request.CategoryId,
             request.Unit,
             request.UnitCost,
@@ -97,10 +102,15 @@ public sealed partial class ProductService(
             return ProductErrors.CategoryDoesNotExist;
         }
 
+        if (await BarcodeInUseAsync(request.Barcode, exceptId: id, cancellationToken))
+        {
+            return ProductErrors.BarcodeAlreadyExists;
+        }
+
         product.UpdateDetails(
             request.Name,
             request.Description,
-            product.Barcode, // temporário: mantém o valor atual até o passo 3
+            request.Barcode,
             request.CategoryId,
             request.Unit,
             request.UnitCost,
@@ -134,6 +144,15 @@ public sealed partial class ProductService(
 
         db.Products.Remove(product);
         return await db.SaveChangesSafelyAsync(cancellationToken);
+    }
+
+    // O índice único do banco é a garantia final; esta checagem só dá uma mensagem amigável (409).
+    private Task<bool> BarcodeInUseAsync(string? barcode, Guid? exceptId, CancellationToken cancellationToken)
+    {
+        var normalized = Product.NormalizeBarcode(barcode);
+        return normalized is null
+            ? Task.FromResult(false)
+            : db.Products.AnyAsync(p => p.Barcode == normalized && p.Id != exceptId, cancellationToken);
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Produto {ProductId} criado com SKU {Sku}")]

@@ -8,6 +8,7 @@ public sealed record ProductResponse(
     string Sku,
     string Name,
     string? Description,
+    string? Barcode,
     Guid CategoryId,
     string CategoryName,
     UnitOfMeasure Unit,
@@ -27,6 +28,8 @@ public interface IProductDetails
 
     string? Description { get; }
 
+    string? Barcode { get; }
+
     Guid CategoryId { get; }
 
     UnitOfMeasure Unit { get; }
@@ -40,6 +43,7 @@ public sealed record CreateProductRequest(
     string Sku,
     string Name,
     string? Description,
+    string? Barcode,
     Guid CategoryId,
     UnitOfMeasure Unit,
     decimal UnitCost,
@@ -50,6 +54,7 @@ public sealed record CreateProductRequest(
 public sealed record UpdateProductRequest(
     string Name,
     string? Description,
+    string? Barcode,
     Guid CategoryId,
     UnitOfMeasure Unit,
     decimal UnitCost,

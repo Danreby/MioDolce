@@ -11,6 +11,13 @@ internal sealed class ProductDetailsValidator : AbstractValidator<IProductDetail
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(Product.NameMaxLength).WithName("Nome");
         RuleFor(x => x.Description).MaximumLength(Product.DescriptionMaxLength).WithName("Descrição");
+        // Opcional: só valida quando veio preenchido. Aceita espaços e hífens ("789 1234-56789").
+        RuleFor(x => x.Barcode)
+            .Must(barcode => Product.NormalizeBarcode(barcode)?.Length is >= Product.BarcodeMinLength and <= Product.BarcodeMaxLength)
+            .When(x => !string.IsNullOrWhiteSpace(x.Barcode))
+            .WithMessage($"O código de barras deve ter de {Product.BarcodeMinLength} a {Product.BarcodeMaxLength} dígitos.")
+            .WithName("Código de barras");
+
         RuleFor(x => x.CategoryId).NotEmpty().WithName("Categoria");
         RuleFor(x => x.Unit).IsInEnum().WithName("Unidade");
 

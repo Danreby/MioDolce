@@ -16,6 +16,7 @@ internal static class ProductMappings
         p.Sku,
         p.Name,
         p.Description,
+        p.Barcode,
         p.CategoryId,
         p.Category!.Name,
         p.Unit,

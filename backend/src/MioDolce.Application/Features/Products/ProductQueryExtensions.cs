@@ -23,7 +23,7 @@ internal static class ProductQueryExtensions
         if (!string.IsNullOrWhiteSpace(filters.Search))
         {
             var term = filters.Search.Trim();
-            query = query.Where(p => p.Name.Contains(term) || p.Sku.Contains(term));
+            query = query.Where(p => p.Name.Contains(term) || p.Sku.Contains(term) || p.Barcode == term);
         }
 
         return filters.Status switch

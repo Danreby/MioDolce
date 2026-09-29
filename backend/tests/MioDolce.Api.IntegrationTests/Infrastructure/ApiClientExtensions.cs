@@ -20,13 +20,14 @@ internal static class ApiClientExtensions
         return await response.ReadAsync<CategoryResponse>(HttpStatusCode.Created);
     }
 
-    public static async Task<ProductResponse> CreateProductAsync(this HttpClient client, decimal initialQuantity = 0)
+    public static async Task<ProductResponse> CreateProductAsync(this HttpClient client, decimal initialQuantity = 0, string? barcode = null)
     {
         var category = await client.CreateCategoryAsync();
         var request = new CreateProductRequest(
             Unique("SKU"),
             "Produto de teste",
             null,
+            barcode,
             category.Id,
             UnitOfMeasure.Unit,
             UnitCost: 10m,
